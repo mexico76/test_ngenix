@@ -1,11 +1,12 @@
+import aiofiles
+import asyncio
 from io import BytesIO
 import os
 import random
 import string
+import uuid
 from xml.dom import minidom
 from zipfile import ZipFile
-import aiofiles
-import asyncio
 
 class randomXmlCreator():
     """
@@ -36,7 +37,7 @@ class randomXmlCreator():
         
         id = main_root.createElement('var') 
         id.setAttribute('name', 'id')
-        id.setAttribute('value', self._generate_random_str())
+        id.setAttribute('value', str(uuid.uuid4()))
         root.appendChild(id)
         
         level = main_root.createElement('var') 
@@ -79,8 +80,8 @@ class archiver():
             await f.write(zip_buffer.getvalue())
     
     async def add_n_archives(self, count: int = 100) -> None:
+        xml_creator = randomXmlCreator()
         for i in range(count):
-            xml_creator = randomXmlCreator()
             await self.add_to_archive(xml_creator.create_n_xmls(), f"{i}.zip")
             
 async def main():

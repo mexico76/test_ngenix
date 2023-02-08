@@ -16,4 +16,5 @@ venv.bak/
 
 
 temp/
+res/
 *.zip
