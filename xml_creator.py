@@ -8,6 +8,7 @@ import uuid
 from xml.dom import minidom
 from zipfile import ZipFile
 
+
 class randomXmlCreator():
     """
     <root>
@@ -19,28 +20,27 @@ class randomXmlCreator():
             <object name=’<случайное строковое значение>’/>…
         </objects>
     </root>
-    
     В тэге objects случайное число (от 1 до 10) вложенных тэгов object.
     """
     def _generate_random_str(self) -> str:
         random_n = random.randint(15, 20)
-        return ''.join(random.choices(string.ascii_uppercase + string.digits ,
+        return ''.join(random.choices(string.ascii_uppercase + string.digits,
                                       k=random_n))
-    
+
     def _generate_random_int(self, start: int = 1, stop: int = 10) -> int:
         return random.randint(start, stop)
-    
+
     def create_xml(self) -> minidom.Document:
         main_root = minidom.Document()
-        root = main_root.createElement('root') 
+        root = main_root.createElement('root')
         main_root.appendChild(root)
         
-        id = main_root.createElement('var') 
+        id = main_root.createElement('var')
         id.setAttribute('name', 'id')
         id.setAttribute('value', str(uuid.uuid4()))
         root.appendChild(id)
         
-        level = main_root.createElement('var') 
+        level = main_root.createElement('var')
         level.setAttribute('name', 'level')
         level.setAttribute('value', f'{self._generate_random_int(1, 100)}')
         root.appendChild(level)
@@ -53,7 +53,7 @@ class randomXmlCreator():
             object.setAttribute('name', self._generate_random_str())
             objects.appendChild(object)
         return main_root
-    
+
     def create_n_xmls(self, count: int = 50) -> list[minidom.Document]:
         n_xmls = []
         for i in range(count):
@@ -66,7 +66,7 @@ class archiver():
     save files to archive
     '''
     async def add_to_archive(self, data: list[minidom.Document],
-                       zip_name: str = '1.zip') -> None:
+                             zip_name: str = '1.zip') -> None:
         current_directory = os.getcwd()
         folder = 'temp'
         path = os.path.join(current_directory, folder)
@@ -75,7 +75,8 @@ class archiver():
         zip_buffer = BytesIO()
         with ZipFile(zip_buffer, 'w') as myzip:
             for i, xml in enumerate(data): 
-                myzip.writestr(f'{i}.xml', str.encode(xml.toprettyxml(indent ="\t")))
+                myzip.writestr(f'{i}.xml', 
+                               str.encode(xml.toprettyxml(indent ="\t")))
         async with aiofiles.open(os.path.join(path, zip_name), 'wb') as f:
             await f.write(zip_buffer.getvalue())
     
@@ -91,10 +92,3 @@ async def main():
     
 if __name__ == '__main__':
     asyncio.run(main())
-            
-            
-        
-        
-    
-    
-    
