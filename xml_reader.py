@@ -15,9 +15,9 @@ class xmlReader():
             по отдельной строке для каждого тэга object
             (получится от 1 до 10 строк на каждый xml файл)
     '''
-    
+
     @staticmethod
-    def xml_reader(data:bytes) -> list:
+    def xml_reader(data: bytes) -> list:
         data = data.decode('utf-8')
         root = ET.fromstring(data)
         id = root[0].get('value')
@@ -32,9 +32,9 @@ class xmlReader():
 class csvWriter():
     '''
     write data to csv file
-    ''' 
-    
-    def save_data_to_csv(self, data:list, path:list) -> None:
+    '''
+
+    def save_data_to_csv(self, data: list, path: list) -> None:
         # path_1, path_2 = self.prepare_data(path)
         with open(path[0], "a+") as file_1:
             writer1 = csv.writer(file_1)
@@ -43,39 +43,43 @@ class csvWriter():
             writer2 = csv.writer(file_2)
             for object in data[1]:
                 writer2.writerow([data[0][0], object])
-    
-        
-    
+
     def prepare_data(self, path: str) -> list:
         name_1 = '1.csv'
         name_2 = '2.csv'
         path_1 = os.path.join(path, name_1)
         path_2 = os.path.join(path, name_2)
         if not os.path.exists(path):
-            os.mkdir(path)  
+            os.mkdir(path)
         with open(path_1, 'w'):
             pass
         with open(path_2, 'w'):
             pass
         return path_1, path_2
-    
+
+
 class unpacker():
     '''
     unpack archive
-    '''   
+    '''
     def __init__(self) -> None:
         self.saver = csvWriter()
-        
-    def unpack_archive(self, save_paths:list[str], source_path: str = os.path.join(os.getcwd(), 'temp/1.zip')) -> None:
+
+    def unpack_archive(self, save_paths: list[str],
+                       source_path: str = os.path.join(os.getcwd(),
+                                                       'temp/1.zip')) -> None:
         with ZipFile(source_path, 'r') as myzip:
             files = myzip.namelist()
             for file in files:
                 if file.endswith('.xml'):
                     with myzip.open(file, 'r') as xml:
-                        csv_data = xmlReader.xml_reader(xml.read()) 
+                        csv_data = xmlReader.xml_reader(xml.read())
                         self.saver.save_data_to_csv(csv_data, save_paths)
-    
-    def unpack_archives_in_folder(self, path: str = os.path.join(os.getcwd(), 'temp')) -> None:
+
+    def unpack_archives_in_folder(
+            self,
+            path: str = os.path.join(os.getcwd(), 'temp')
+            ) -> None:
         save_path = os.path.join(os.getcwd(), 'res')
         paths = self.saver.prepare_data(save_path)
         zips = []
@@ -85,8 +89,6 @@ class unpacker():
                     zips.append((paths, os.path.join(path, file)))
         with Pool() as pool:
             pool.starmap(self.unpack_archive, zips)
-    
-                    
 
 
 if __name__ == '__main__':
